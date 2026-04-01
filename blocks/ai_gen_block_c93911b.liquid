@@ -1,0 +1,395 @@
+{% doc %}
+  @prompt
+    Create a Shopify theme section that displays a PDF file using an iframe. Include a theme customizer setting that allows merchants to select and upload a PDF file. The section should have proper styling and be responsive for different screen sizes.
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-pdf-viewer-{{ ai_gen_id }} {
+    width: 100%;
+    padding: {{ block.settings.section_padding }}px 0;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-pdf-viewer-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-pdf-viewer-header-{{ ai_gen_id }} {
+    text-align: {{ block.settings.text_alignment }};
+    margin-bottom: 24px;
+  }
+
+  .ai-pdf-viewer-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px 0;
+    font-weight: 600;
+  }
+
+  .ai-pdf-viewer-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.description_color }};
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .ai-pdf-viewer-iframe-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.iframe_height }}px;
+    border: {{ block.settings.border_width }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-pdf-viewer-iframe-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  .ai-pdf-viewer-placeholder-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .ai-pdf-viewer-placeholder-icon-{{ ai_gen_id }} {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .ai-pdf-viewer-placeholder-text-{{ ai_gen_id }} {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .ai-pdf-viewer-placeholder-subtext-{{ ai_gen_id }} {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  .ai-pdf-viewer-fallback-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: {{ block.settings.border_radius }}px;
+    margin-top: 16px;
+  }
+
+  .ai-pdf-viewer-download-link-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: {{ block.settings.button_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-pdf-viewer-download-link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_color }};
+    color: {{ block.settings.button_text_color }};
+  }
+
+  .ai-pdf-viewer-download-icon-{{ ai_gen_id }} {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-pdf-viewer-container-{{ ai_gen_id }} {
+      padding: 0 16px;
+    }
+
+    .ai-pdf-viewer-iframe-wrapper-{{ ai_gen_id }} {
+      height: {{ block.settings.iframe_height | times: 0.7 }}px;
+    }
+
+    .ai-pdf-viewer-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.9 }}px;
+    }
+
+    .ai-pdf-viewer-description-{{ ai_gen_id }} {
+      font-size: {{ block.settings.description_size | times: 0.9 }}px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .ai-pdf-viewer-iframe-wrapper-{{ ai_gen_id }} {
+      height: {{ block.settings.iframe_height | times: 0.6 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-pdf-viewer-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-pdf-viewer-container-{{ ai_gen_id }}">
+    {% if block.settings.title != blank or block.settings.description != blank %}
+      <div class="ai-pdf-viewer-header-{{ ai_gen_id }}">
+        {% if block.settings.title != blank %}
+          <h2 class="ai-pdf-viewer-title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+        {% endif %}
+        {% if block.settings.description != blank %}
+          <div class="ai-pdf-viewer-description-{{ ai_gen_id }}">{{ block.settings.description }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="ai-pdf-viewer-iframe-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.pdf_url != blank %}
+        <iframe
+          src="{{ block.settings.pdf_url }}"
+          class="ai-pdf-viewer-iframe-{{ ai_gen_id }}"
+          title="PDF Viewer"
+          loading="lazy"
+        ></iframe>
+        
+        {% if block.settings.show_download_link %}
+          <div class="ai-pdf-viewer-fallback-{{ ai_gen_id }}">
+            <a 
+              href="{{ block.settings.pdf_url }}" 
+              class="ai-pdf-viewer-download-link-{{ ai_gen_id }}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg class="ai-pdf-viewer-download-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+              </svg>
+              {{ block.settings.download_text }}
+            </a>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="ai-pdf-viewer-placeholder-{{ ai_gen_id }}">
+          <svg class="ai-pdf-viewer-placeholder-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+          </svg><div class="ai-pdf-viewer-placeholder-text-{{ ai_gen_id }}">No PDF file selected</div>
+          <div class="ai-pdf-viewer-placeholder-subtext-{{ ai_gen_id }}">Add a PDF URL in the theme customizer</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "PDF Viewer",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "View PDF Document"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Click to view the PDF document below.</p>"
+    },
+    {
+      "type": "text",
+      "id": "pdf_url",
+      "label": "PDF URL",
+      "info": "Enter the full URL to your PDF file. Upload your PDF to Shopify Files or host it externally."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_download_link",
+      "label": "Show download link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "download_text",
+      "label": "Download link text",
+      "default": "Download PDF"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 600,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum width",
+      "default": 1000
+    },
+    {
+      "type": "range",
+      "id": "iframe_height",
+      "min": 400,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "label": "PDF viewer height",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Download button color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Download button hover color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Download button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title font size",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Description font size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDF Viewer"
+    }
+  ]
+}
+{% endschema %}

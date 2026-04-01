@@ -1,0 +1,126 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+  .pdf-main-wrapper iframe {
+    width: 100%;
+    height: 90vh;
+    border: none;
+    display: block;
+    max-height: 1000px;
+}
+  .pdf-header h2.title {
+    text-align: center;
+}
+{%- endstyle -%}
+
+
+<div class="pdf-wrapper color-{{ section.settings.color_scheme }} isolate gradient">
+  <div class="page-width  section-{{ section.id }}-padding">
+    {%- if section.settings.title != blank -%}
+      <div class="pdf-header">
+        <h2 class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+          {{ section.settings.title }}
+        </h2>
+    </div>
+  {%- endif -%}
+  {%- if section.settings.pdf_url != blank -%}
+    <div class="pdf-main-wrapper">
+       <iframe
+      src="{{ section.settings.pdf_url }}"
+      width="100%"
+      height="90vh"
+      max-height= "1000px"
+      style="border: none;"
+      loading="lazy"
+    >
+    </iframe>
+  </div>
+   {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "PDF Viewer",
+    "class": "section pdf-section",
+    "settings": [
+       {
+        "type": "text",
+        "id": "title",
+        "label": "PDF Title",
+        "default": "View our catalog"
+      },
+       {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "t:sections.all.heading_size.options__1.label"
+        },
+        {
+          "value": "h1",
+          "label": "t:sections.all.heading_size.options__2.label"
+        },
+        {
+          "value": "h0",
+          "label": "t:sections.all.heading_size.options__3.label"
+        },
+        {
+          "value": "hxl",
+          "label": "t:sections.all.heading_size.options__4.label"
+        },
+        {
+          "value": "hxxl",
+          "label": "t:sections.all.heading_size.options__5.label"
+        }
+      ],
+      "default": "h1",
+      "label": "t:sections.all.heading_size.label"
+    },
+      {
+        "type": "url",
+        "id": "pdf_url",
+        "label": "PDF File URL"
+      },
+       {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDF Viewer"
+    }
+  ]
+  }
+{% endschema %}

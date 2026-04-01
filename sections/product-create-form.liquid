@@ -1,0 +1,101 @@
+{% comment %}
+<div class="product-create-form">
+  <div class="page-width">
+    <h2>Create Product with Variants</h2>
+
+    <input type="text" id="productTitle" placeholder="Product Title" required><br>
+
+    <label>Color Variants:</label>
+    <input type="text" id="colorVariants" placeholder="Comma separated (e.g., Red,Blue)" required><br>
+
+    <label>Size Variants:</label>
+    <input type="text" id="sizeVariants" placeholder="Comma separated (e.g., S,M,L)" required><br>
+    <br>
+
+    <label>Enter Price for Each Variant:</label><br>
+    <textarea
+      id="variantPrices"
+      rows="5"
+      cols="50"
+      placeholder="e.g., Red-S:100, Red-M:110, Blue-L:120"
+      required
+    ></textarea
+    ><br>
+    <br>
+
+    <button onclick="createProduct()">Create Product</button>
+    <p id="statusMessage"></p>
+  </div>
+</div>
+
+<script>
+   function createProduct() {
+    const title = document.getElementById('productTitle').value.trim();
+   // const imageInput = document.getElementById('productImage').files[0];
+    const colors = document.getElementById('colorVariants').value.trim().split(',').map(c => c.trim()).filter(Boolean);
+    const sizes = document.getElementById('sizeVariants').value.trim().split(',').map(s => s.trim()).filter(Boolean);
+    const priceMapRaw = document.getElementById('variantPrices').value.trim();
+
+    if (!title || colors.length === 0 || sizes.length === 0 || !priceMapRaw) {
+      document.getElementById('statusMessage').innerText = 'All fields are required';
+      return;
+    }
+
+    const priceMap = {};
+    const lines = priceMapRaw.split(',');
+
+    let isValid = true;
+    lines.forEach(pair => {
+      const [key, value] = pair.split(':').map(s => s?.trim());
+      if (!key || !value) {
+        isValid = false;
+      } else {
+        priceMap[key] = value;
+      }
+    });
+
+    if (!isValid) {
+      document.getElementById('statusMessage').innerText = '⚠️ Please enter prices in correct format like Red-S:100';
+      return;
+    }
+
+    const productData = { title, colors, sizes, priceMap };
+
+
+      sendData(productData); // ✅ safe call
+
+  }
+
+  // ✅ THIS FUNCTION WAS MISSING EARLIER
+  function sendData(productData) {
+    fetch('http://localhost:3000/create-product-with-variants', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(productData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('statusMessage').innerText = data.message;
+    })
+    .catch(err => {
+      document.getElementById('statusMessage').innerText = 'Error creating product';
+      console.error(err);
+    });
+  }
+</script>
+{% endcomment %}
+<iframe allowfullscreen="allowfullscreen" allow="clipboard-write" scrolling="no" class="fp-iframe" src="https://heyzine.com/flip-book/7f8c4322de.html" style="border: 1px solid lightgray; width: 100%; height: 800px;"></iframe>
+
+
+{% schema %}
+{
+  "name": "Product Create Form",
+  "tag": "section",
+  "settings": [],
+  "presets": [{
+    "name": "Product Create Form"
+  }]
+}
+{% endschema %}
